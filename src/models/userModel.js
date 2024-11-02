@@ -10,8 +10,8 @@ const userModel = {
    */
   async createUser(email, username, password) {
     const { data, error } = await supabase
-      .from("users")
-      .insert([{ email, username, password }]);
+      .from("user-service")
+      .insert([{ email: email, username: username, password: password }]);
 
     if (error) {
       throw new Error(error.message);
