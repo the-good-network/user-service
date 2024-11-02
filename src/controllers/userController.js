@@ -10,6 +10,6 @@ export const signupUser = async (req, res) => {
     const user = await userModel.createUser(email, username, hashedPassword);
     res.status(201).json({ message: "User created successfully", user: user });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message, message: "Can't create user" });
   }
 };
