@@ -79,12 +79,18 @@ const userController = {
     }
   },
 
+  /**
+   * This function gets all users from the database
+   * @param {*} req The request object
+   * @param {*} res The response object
+   * @returns An array of user objects from the database
+   */
   getAllUsers: async (req, res) => {
     try {
       const users = await userModel.getAllUsers();
-      res.status(200).json({ users: users });
+      return res.status(200).json({ users: users });
     } catch (error) {
-      res
+      return res
         .status(500)
         .json({ error: error.message, message: "Can't get users" });
     }
