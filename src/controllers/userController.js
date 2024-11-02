@@ -45,13 +45,26 @@ const userController = {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
 
-      res.status(200).json({ message: "User logged in", token: token });
+      const refreshToken = jwt.sign(
+        { id: user.id },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: "30d" }
+      );
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+      });
+
+      return res
+        .status(200)
+        .json({ message: "User logged in", accessToken: accessToken });
     } catch (error) {
-      res
+      return res
         .status(500)
         .json({ error: error.message, message: "Can't login user" });
     }
@@ -73,9 +86,11 @@ const userController = {
         return res.status(404).json({ message: "User not found" });
       }
 
-      res.status(200).json({ user: user });
+      return res.status(200).json({ user: user });
     } catch (error) {
-      res.status(500).json({ error: error.message, message: "Can't get user" });
+      return res
+        .status(500)
+        .json({ error: error.message, message: "Can't get user" });
     }
   },
 
