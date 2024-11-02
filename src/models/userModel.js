@@ -6,12 +6,13 @@ const userModel = {
    * @param {*} email The user's email
    * @param {*} username The user's username
    * @param {*} password The user's hashed password
-   * @returns
+   * @returns The created user object
    */
   async createUser(email, username, password) {
     const { data, error } = await supabase
       .from("user-service")
-      .insert([{ email: email, username: username, password: password }]);
+      .insert([{ email: email, username: username, password: password }])
+      .select("*");
 
     if (error) {
       throw new Error(error.message);
