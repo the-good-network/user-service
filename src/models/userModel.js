@@ -55,6 +55,19 @@ const userModel = {
   },
 
   /**
+   * This function gets all users from the database
+   * @returns An array of user objects from the database
+   */
+  async getAllUsers() {
+    const { data, error } = await supabase.from("user-service").select("*");
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data; // Return all user objects
+  },
+
+  /**
    * This function updates a user's data in the database
    * @param {*} id The user's id in the database
    * @param {*} data The updated user data to be saved
