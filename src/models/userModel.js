@@ -20,7 +20,23 @@ const userModel = {
     return data;
   },
 
-  async findUserByEmail(email) {},
+  /**
+   * This function finds a user by their email address
+   * @param {*} email The user's email address
+   * @returns The user object from the database
+   */
+  async findUserByEmail(email) {
+    const {data, error} = await supabase
+      .from("user-service")
+      .select("*")
+      .eq("email", email);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data[0]; // Return the first user object
+  },
+
   async findUserById(id) {},
   async updateUser(id, data) {},
   async deleteUser(id) {},
