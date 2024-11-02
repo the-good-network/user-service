@@ -51,11 +51,45 @@ const userModel = {
     if (error) {
       throw new Error(error.message);
     }
-    return data[0];
+    return data[0]; // Return the first user object
   },
-  
-  async updateUser(id, data) {},
-  async deleteUser(id) {},
+
+  /**
+   * This function updates a user's data in the database
+   * @param {*} id The user's id in the database
+   * @param {*} data The updated user data to be saved
+   * @returns The updated user object from the database
+   */
+  async updateUser(id, data) {
+    const { data, error } = await supabase
+      .from("user-service")
+      .update(data)
+      .eq("id", id)
+      .select("*");
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data[0]; // Return the first user object
+  },
+
+  /**
+   * This function deletes a user from the database
+   * @param {*} id The user's id in the database
+   * @returns The deleted user object from the database
+   */
+  async deleteUser(id) {
+    const { data, error } = await supabase
+      .from("user-service")
+      .delete()
+      .eq("id", id)
+      .select("*");
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data[0]; // Return the first user object
+  },
 };
 
 export default userModel;
