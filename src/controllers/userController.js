@@ -30,7 +30,7 @@ export const signupUser = async (req, res) => {
  * @param {*} res The response object
  * @returns A success message and a JWT token
  */
-export const loginUser = async (req, res) => {
+export const loginUserUsingEmail = async (req, res) => {
   const { email, password } = req.body;
 
   try {
