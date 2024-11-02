@@ -60,10 +60,10 @@ const userModel = {
    * @param {*} data The updated user data to be saved
    * @returns The updated user object from the database
    */
-  async updateUser(id, data) {
+  async updateUser(id, updatedData) {
     const { data, error } = await supabase
       .from("user-service")
-      .update(data)
+      .update(updatedData)
       .eq("id", id)
       .select("*");
 
