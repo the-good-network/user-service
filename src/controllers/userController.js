@@ -49,6 +49,7 @@ const userController = {
         expiresIn: "1h",
       });
 
+      // Create a refresh token and set it as a cookie for long-term authentication
       const refreshToken = jwt.sign(
         { id: user.id },
         process.env.REFRESH_TOKEN_SECRET,
