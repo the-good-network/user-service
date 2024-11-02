@@ -26,7 +26,7 @@ const userModel = {
    * @returns The user object from the database
    */
   async findUserByEmail(email) {
-    const {data, error} = await supabase
+    const { data, error } = await supabase
       .from("user-service")
       .select("*")
       .eq("email", email);
@@ -37,7 +37,23 @@ const userModel = {
     return data[0]; // Return the first user object
   },
 
-  async findUserById(id) {},
+  /**
+   * This function finds a user by their id
+   * @param {*} id The user's id in the database
+   * @returns The user object from the database
+   */
+  async findUserById(id) {
+    const { data, error } = await supabase
+      .from("user-service")
+      .select("*")
+      .eq("id", id);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data[0];
+  },
+  
   async updateUser(id, data) {},
   async deleteUser(id) {},
 };
