@@ -60,28 +60,3 @@ export const logout = async (req, res) => {
       action: "Remove access token from client side",
     });
 };
-
-/**
- * Refreshes the user's JWT access token
- * @param {*} req The request object
- * @param {*} res The response object
- * @returns A new JWT token for the user
- */
-export const refreshToken = async (req, res) => {
-  const { refreshToken } = req.cookies;
-
-  if (!refreshToken) {
-    return res.status(401).json({ message: "No refresh token provided" });
-  }
-
-  try {
-    const payload = verifyToken(refreshToken);
-    const newAccessToken = generateAccessToken(payload.id);
-
-    return res.status(200).json({ accessToken: newAccessToken });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ error: error.message, message: "Invalid or expired token" });
-  }
-};
