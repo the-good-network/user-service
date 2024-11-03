@@ -21,11 +21,24 @@ export const generateRefreshToken = (userID) => {
 };
 
 /**
- * Verifies a token with the provided secret
- * @param {*} token The token to verify
- * @param {*} secret The secret key to verify the token with
- * @returns The decoded payload of the token
+ * Verifies a token with the provided secret keys for access and refresh tokens
+ * @param {string} token - The token to verify
+ * @returns {Object|null} - The decoded payload of the token, or null if verification fails
  */
-export const verifyAccessToken = (token, secret) => {
-  return jwt.verify(token, secret);
+export const verifyAccessToken = (token) => {
+  try {
+    // Try verifying with the access token secret
+    const decodedAccess = jwt.verify(token, process.env.JWT_SECRET);
+    return { type: 'access', payload: decodedAccess };
+  } catch (error) {
+    // If access token verification fails, try verifying with the refresh token secret
+    try {
+      const decodedRefresh = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+      return { type: 'refresh', payload: decodedRefresh };
+    } catch (refreshError) {
+      // If both verifications fail, return null or handle the error appropriately
+      console.error('Token verification failed:', refreshError.message);
+      return null;
+    }
+  }
 };
