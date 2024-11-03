@@ -25,7 +25,7 @@ export const generateRefreshToken = (userID) => {
  * @param {string} token - The token to verify
  * @returns {Object|null} - The decoded payload of the token, or null if verification fails
  */
-export const verifyAccessToken = (token) => {
+export const verifyToken = (token) => {
   try {
     // Try verifying with the access token secret
     const decodedAccess = jwt.verify(token, process.env.JWT_SECRET);
