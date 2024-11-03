@@ -33,9 +33,11 @@ export const loginUsingEmail = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
+    // Send the access token in local storage
+    localStorage.setItem("accessToken", accessToken);
+
     return res.status(200).json({
       message: "User logged in successfully",
-      accessToken: accessToken,
     });
   } catch (error) {
     return res
