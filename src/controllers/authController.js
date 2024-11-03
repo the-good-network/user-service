@@ -53,7 +53,12 @@ export const loginUsingEmail = async (req, res) => {
  */
 export const logout = async (req, res) => {
   res.clearCookie("refreshToken");
-  return res.status(200).json({ message: "Logged out successfully" });
+  return res
+    .status(200)
+    .json({
+      message: "Logged out successfully",
+      action: "Remove access token from client side",
+    });
 };
 
 /**
