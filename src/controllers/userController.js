@@ -26,52 +26,6 @@ const userController = {
   },
 
   /**
-   * This function logs in a user by checking the user's credentials
-   * @param {*} req The request object
-   * @param {*} res The response object
-   * @returns A success message and a JWT token
-   */
-  loginUserUsingEmail: async (req, res) => {
-    const { email, password } = req.body;
-
-    try {
-      const user = await userModel.findUserByEmail(email);
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      if (!bcrypt.compareSync(password, user.password)) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
-
-      // Create a refresh token and set it as a cookie for long-term authentication
-      const refreshToken = jwt.sign(
-        { id: user.id },
-        process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: "30d" }
-      );
-
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: true,
-      });
-
-      return res
-        .status(200)
-        .json({ message: "User logged in", accessToken: accessToken });
-    } catch (error) {
-      return res
-        .status(500)
-        .json({ error: error.message, message: "Can't login user" });
-    }
-  },
-
-  /**
    * This function gets a user's data from the database
    * @param {*} req The request object
    * @param {*} res The response object
