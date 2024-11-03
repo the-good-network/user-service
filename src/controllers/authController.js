@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import {
   generateAccessToken,
   generateRefreshToken,
-  verifyAccessToken,
+  verifyToken,
 } from "../utils/jwtUtils.js";
 import userModel from "../models/userModel.js";
 
@@ -33,8 +33,7 @@ export const loginUsingEmail = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
-    // Send the access token in local storage
-    localStorage.setItem("accessToken", accessToken);
+    res.header("Authorization", `Bearer ${accessToken}`);
 
     return res.status(200).json({
       message: "User logged in successfully",
@@ -71,10 +70,7 @@ export const refreshToken = async (req, res) => {
   }
 
   try {
-    const payload = verifyAccessToken(
-      refreshToken,
-      process.env.REFRESH_TOKEN_SECRET
-    );
+    const payload = verifyToken(refreshToken);
     const newAccessToken = generateAccessToken(payload.id);
 
     return res.status(200).json({ accessToken: newAccessToken });
