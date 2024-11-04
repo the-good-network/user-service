@@ -30,10 +30,11 @@ export const sendForgotPasswordEmail = async (from, to, resetCode) => {
     });
 
     if (data) {
-      return { message: "Password reset email sent successfully" };
+      return { status: 200, message: "Password reset email sent successfully" };
     }
   } catch (error) {
     return {
+      status: 500,
       error: error.message,
       message: "Could not send password reset email",
     };
