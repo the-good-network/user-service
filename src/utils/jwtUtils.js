@@ -29,16 +29,42 @@ export const verifyToken = (token) => {
   try {
     // Try verifying with the access token secret
     const decodedAccess = jwt.verify(token, process.env.JWT_SECRET);
-    return { type: 'access', payload: decodedAccess };
+    return { type: "access", payload: decodedAccess };
   } catch (error) {
     // If access token verification fails, try verifying with the refresh token secret
     try {
-      const decodedRefresh = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-      return { type: 'refresh', payload: decodedRefresh };
+      const decodedRefresh = jwt.verify(
+        token,
+        process.env.REFRESH_TOKEN_SECRET
+      );
+      return { type: "refresh", payload: decodedRefresh };
     } catch (refreshError) {
       // If both verifications fail, return null or handle the error appropriately
-      console.error('Token verification failed:', refreshError.message);
+      console.error("Token verification failed:", refreshError.message);
       return null;
     }
+  }
+};
+
+/**
+ * Refreshes the user's access & refresh tokens
+ * Stores the new refresh token in an HTTP-only cookie
+ * @param {*} req The request object
+ * @param {*} res The response object
+ * @returns The latest access token
+ */
+export const refreshAllTokens = (refreshToken) => {
+  const refreshTokenVerification = verifyToken(refreshToken);
+  if (refreshTokenVerification && refreshTokenVerification.type === "refresh") {
+    // Generate new access and refresh tokens
+    const newAccessToken = generateAccessToken(
+      refreshTokenVerification.payload.id
+    );
+    const newRefreshToken = generateRefreshToken(
+      refreshTokenVerification.payload.id
+    );
+    return { newAccessToken, newRefreshToken };
+  } else {
+    return null;
   }
 };
