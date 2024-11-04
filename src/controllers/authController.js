@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 import {
   generateAccessToken,
   generateRefreshToken,
-  verifyToken,
 } from "../utils/jwtUtils.js";
 import userModel from "../models/userModel.js";
 
