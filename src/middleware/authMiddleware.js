@@ -1,7 +1,6 @@
 import {
   verifyToken,
-  generateAccessToken,
-  generateRefreshToken,
+  refreshAllTokens,
 } from "../utils/jwtUtils.js";
 
 /**
@@ -31,36 +30,20 @@ export const authenticate = (req, res, next) => {
   const refreshToken = req.cookies.refreshToken;
 
   if (refreshToken) {
-    const refreshTokenVerification = verifyToken(refreshToken);
-
-    if (
-      refreshTokenVerification &&
-      refreshTokenVerification.type === "refresh"
-    ) {
-      // Generate new access and refresh tokens
-      const newAccessToken = generateAccessToken(
-        refreshTokenVerification.payload.id
-      );
-      const newRefreshToken = generateRefreshToken(
-        refreshTokenVerification.payload.id
-      );
-
-      // Send the new refresh token as an HTTP-only cookie to extend the session
-      res.cookie("refreshToken", newRefreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "Strict",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      });
-
-      // Also send the new access token in the response body or header
-      res.setHeader("Authorization", `Bearer ${newAccessToken}`);
-
-      // Set the user ID in the request object
-      const newAccessTokenVerification = verifyToken(newAccessToken);
-      req.user = newAccessTokenVerification.payload;
-      return next();
-    }
+    const { newAccessToken, newRefreshToken } = refreshAllTokens(refreshToken);
+    // Send the new refresh token as an HTTP-only cookie to extend the session
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+    // Also send the new access token in the response body or header
+    res.setHeader("Authorization", `Bearer ${newAccessToken}`);
+    // Set the user ID in the request object
+    const newAccessTokenVerification = verifyToken(newAccessToken);
+    req.user = newAccessTokenVerification.payload;
+    return next();
   }
 
   // If both tokens are invalid or expired
