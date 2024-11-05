@@ -17,7 +17,7 @@ app.use("/user", userRoutes);
 
 // Protected route example using the authenticate middleware
 app.get("/protected", authenticate, (req, res) => {
-  res.json({ message: `Hello, user ${req.user.id}!` });
+  res.json({ message: `Hello, user ${req.id}!` });
 });
 
 const PORT = process.env.PORT || 3000;
