@@ -12,7 +12,7 @@ const authModel = {
     const expirationTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
     const { data, error } = await supabase
-      .from("reset_code")
+      .from("reset-code")
       .insert([
         {
           userID: userID,
@@ -36,7 +36,7 @@ const authModel = {
    */
   async getResetCode(userID) {
     const { data, error } = await supabase
-      .from("reset_code")
+      .from("reset-code")
       .select("*")
       .eq("userID", userID)
       .single();
@@ -55,7 +55,7 @@ const authModel = {
    */
   async deleteResetCode(userID) {
     const { error } = await supabase
-      .from("reset_code")
+      .from("reset-code")
       .delete()
       .eq("userID", userID);
 
