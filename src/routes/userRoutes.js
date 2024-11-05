@@ -12,4 +12,6 @@ router.post("/reset-password", userController.resetPassword);
 router.get("/all", authenticate, admin, userController.getAllUsers);
 router.get("/:id", authenticate, admin, userController.getUser);
 
+router.get("/", authenticate, userController.getOwnProfile)
+
 export default router;
