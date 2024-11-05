@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
+import { sendSignupEmail } from "./emailController.js";
 
 const userController = {
   /**
@@ -15,6 +16,13 @@ const userController = {
 
     try {
       const user = await userModel.createUser(email, username, hashedPassword);
+      if (user) {
+        await sendSignupEmail(
+          process.env.RESEND_DEFAULT_EMAIL,
+          email,
+          username
+        );
+      }
       return res
         .status(201)
         .json({ message: "User created successfully", user: user });
