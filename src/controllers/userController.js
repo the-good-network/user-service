@@ -63,13 +63,13 @@ const userController = {
           .json({ message: "Invalid or expired reset token" });
       }
 
-      const user = decoded.payload;
-      if (!user) {
+      const userID = decoded.payload.id;
+      if (!userID) {
         return res.status(404).json({ message: "User does not exist" });
       }
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await userModel.updateUser(user.id, {
+      await userModel.updateUser(userID, {
         password: hashedPassword,
       });
 
@@ -90,7 +90,7 @@ const userController = {
    * @param {*} res The response object
    * @returns The user object from the database
    */
-  getUserData: async (req, res) => {
+  getUser: async (req, res) => {
     const { id } = req.params;
 
     try {
