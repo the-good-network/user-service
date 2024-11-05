@@ -104,7 +104,7 @@ export const verifyResetCode = async (req, res) => {
       return res.status(404).json({ message: "No reset code found" });
     }
 
-    const { resetCode, expirationTime } = resetData;
+    const { resetCode, expirationTime } = resetData.data;
 
     const isValid = validateResetCode(enteredCode, resetCode, expirationTime);
 
