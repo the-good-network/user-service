@@ -16,6 +16,6 @@ export const generateResetCode = () => {
  * @returns {boolean} True if the code is valid and within the expiration time; otherwise, false.
  */
 export const validateResetCode = (enteredCode, emailedCode, expirationTime) => {
-  const currentTime = Date.now();
+  const currentTime = new Date().toISOString();
   return enteredCode === emailedCode && currentTime < expirationTime;
 };
