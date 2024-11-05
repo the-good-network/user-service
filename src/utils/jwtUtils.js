@@ -55,7 +55,7 @@ export const refreshAllTokens = (refreshToken) => {
   const refreshTokenVerification = verifyToken(refreshToken, "refresh");
   if (refreshTokenVerification && refreshTokenVerification.type === "refresh") {
     // Generate new access and refresh tokens
-    const newAccessToken = generateToken(refreshTokenVerification.payload.id);
+    const newAccessToken = generateToken(refreshTokenVerification.payload.id, "1h");
     const newRefreshToken = generateRefreshToken(
       refreshTokenVerification.payload.id
     );
