@@ -3,10 +3,11 @@ import jwt from "jsonwebtoken";
 /**
  * Generates an access token for the user
  * @param {*} userID The user's ID to generate the access token for
+ * @param {} time The time the token is valid for
  * @returns The generated access token for the user
  */
-export const generateAccessToken = (userID) => {
-  return jwt.sign({ id: userID }, process.env.JWT_SECRET, { expiresIn: "1h" });
+export const generateToken = (userID, time) => {
+  return jwt.sign({ id: userID }, process.env.JWT_SECRET, { expiresIn: time });
 };
 
 /**
@@ -25,24 +26,21 @@ export const generateRefreshToken = (userID) => {
  * @param {string} token - The token to verify
  * @returns {Object|null} - The decoded payload of the token, or null if verification fails
  */
-export const verifyToken = (token) => {
+export const verifyToken = (token, tokenType = "access") => {
   try {
-    // Try verifying with the access token secret
-    const decodedAccess = jwt.verify(token, process.env.JWT_SECRET);
-    return { type: "access", payload: decodedAccess };
+    const secret =
+      tokenType === "access"
+        ? process.env.JWT_SECRET
+        : process.env.REFRESH_TOKEN_SECRET;
+
+    const decoded = jwt.verify(token, secret);
+    return { type: tokenType, payload: decoded };
   } catch (error) {
-    // If access token verification fails, try verifying with the refresh token secret
-    try {
-      const decodedRefresh = jwt.verify(
-        token,
-        process.env.REFRESH_TOKEN_SECRET
-      );
-      return { type: "refresh", payload: decodedRefresh };
-    } catch (refreshError) {
-      // If both verifications fail, return null or handle the error appropriately
-      console.error("Token verification failed:", refreshError.message);
-      return null;
-    }
+    console.error(
+      `Token verification failed for ${tokenType} token:`,
+      error.message
+    );
+    return null;
   }
 };
 
@@ -54,15 +52,14 @@ export const verifyToken = (token) => {
  * @returns The latest access token
  */
 export const refreshAllTokens = (refreshToken) => {
-  const refreshTokenVerification = verifyToken(refreshToken);
+  const refreshTokenVerification = verifyToken(refreshToken, "refresh");
   if (refreshTokenVerification && refreshTokenVerification.type === "refresh") {
     // Generate new access and refresh tokens
-    const newAccessToken = generateAccessToken(
-      refreshTokenVerification.payload.id
-    );
+    const newAccessToken = generateToken(refreshTokenVerification.payload.id);
     const newRefreshToken = generateRefreshToken(
       refreshTokenVerification.payload.id
     );
+
     return { newAccessToken, newRefreshToken };
   } else {
     return null;
