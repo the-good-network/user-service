@@ -30,12 +30,12 @@ const authModel = {
   },
 
   /**
-   * Retrieves and deletes the reset code for a given user ID.
+   * Retrieves the reset code for a given user ID.
    * @param {number} userID - The ID of the user.
    * @returns {Object} The reset code data, if available.
    */
-  async getAndDeleteResetCode(userID) {
-    // First select the reset code for the user
+  async getResetCode(userID) {
+    // Retrieve the reset code data for the specified user ID
     const { data, error } = await supabase
       .from("reset_code")
       .select("*")
@@ -46,17 +46,25 @@ const authModel = {
       throw new Error(error.message);
     }
 
-    // Delete the reset code entry after retrieving it
-    const { error: deleteError } = await supabase
+    return data;
+  },
+
+  /**
+   * Deletes the reset code for a given user ID.
+   * @param {number} userID - The ID of the user.
+   * @returns {Object} A success message if deletion was successful.
+   */
+  async deleteResetCode(userID) {
+    const { error } = await supabase
       .from("reset_code")
       .delete()
       .eq("userID", userID);
 
-    if (deleteError) {
-      throw new Error(deleteError.message);
+    if (error) {
+      throw new Error(error.message);
     }
 
-    return data;
+    return { message: "Reset Code deleted successfully" };
   },
 };
 
