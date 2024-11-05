@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { generateToken, generateRefreshToken } from "../utils/jwtUtils.js";
 import { generateResetCode, validateResetCode } from "../utils/utils.js";
 import userModel from "../models/userModel.js";

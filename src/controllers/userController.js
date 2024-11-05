@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { verifyToken } from "../utils/jwtUtils.js";
 import userModel from "../models/userModel.js";
 import { sendSignupEmail } from "./emailController.js";
