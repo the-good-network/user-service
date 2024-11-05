@@ -1,7 +1,8 @@
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import authRoutes from './routes/authRoutes.js';
-import { authenticate } from './middleware/authMiddleware.js';
+import express from "express";
+import cookieParser from "cookie-parser";
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import { authenticate } from "./middleware/authMiddleware.js";
 
 const app = express();
 
@@ -9,10 +10,13 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Authentication routes
-app.use('/auth', authRoutes);
+app.use("/auth", authRoutes);
+
+// User routes
+app.use("/user", userRoutes);
 
 // Protected route example using the authenticate middleware
-app.get('/protected', authenticate, (req, res) => {
+app.get("/protected", authenticate, (req, res) => {
   res.json({ message: `Hello, user ${req.user.id}!` });
 });
 
