@@ -1,8 +1,5 @@
 import bcrypt from "bcrypt";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-} from "../utils/jwtUtils.js";
+import { generateToken, generateRefreshToken } from "../utils/jwtUtils.js";
 import { generateResetCode, validateResetCode } from "../utils/utils.js";
 import userModel from "../models/userModel.js";
 import authModel from "../models/authModel.js";
@@ -24,7 +21,7 @@ export const loginUsingEmail = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const accessToken = generateAccessToken(user.id);
+    const accessToken = generateToken(user.id, "1h");
     const refreshToken = generateRefreshToken(user.id);
 
     // Send refresh token as an HTTP-only cookie
@@ -109,7 +106,19 @@ export const verifyResetCode = async (req, res) => {
     const isValid = validateResetCode(enteredCode, resetCode, expirationTime);
 
     if (isValid) {
+      // Generate a reset token and store it as an HTTP-only cookie
+      const resetToken = generateToken(userID, "10m");
+
+      res.cookie("resetToken", resetToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: 10 * 60 * 1000,
+      });
+
+      // Delete reset code from database after use
       await authModel.deleteResetCode(userID);
+
       return res.status(200).json({ message: "Reset code verified" });
     } else {
       return res.status(400).json({ message: "Invalid or expired reset code" });
