@@ -26,7 +26,7 @@ const authModel = {
       throw new Error(error.message);
     }
 
-    return data;
+    return { data, message: "Reset code inserted successfully" };
   },
 
   /**
@@ -35,18 +35,17 @@ const authModel = {
    * @returns {Object} The reset code data, if available.
    */
   async getResetCode(userID) {
-    // Retrieve the reset code data for the specified user ID
     const { data, error } = await supabase
       .from("reset_code")
       .select("*")
       .eq("userID", userID)
-      .single(); // Retrieve only one result
+      .single();
 
     if (error) {
       throw new Error(error.message);
     }
 
-    return data;
+    return { data, message: "Reset code retrieved successfully" };
   },
 
   /**
@@ -64,7 +63,7 @@ const authModel = {
       throw new Error(error.message);
     }
 
-    return { message: "Reset Code deleted successfully" };
+    return { message: "Reset code deleted successfully" };
   },
 };
 
