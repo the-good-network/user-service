@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import { verifyToken } from "../utils/jwtUtils.js";
 import userModel from "../models/userModel.js";
 import { sendSignupEmail } from "./emailController.js";
 
@@ -45,19 +46,35 @@ const userController = {
    * @returns Success or error message
    */
   resetPassword: async (req, res) => {
-    const { email, newPassword } = req.body;
+    const { newPassword } = req.body;
+    const resetToken = req.cookies.resetToken;
+
+    if (!resetToken) {
+      return res
+        .status(401)
+        .json({ message: "Reset token not found or expired" });
+    }
 
     try {
-      const user = await userModel.findUserByEmail(email);
+      const decoded = verifyToken(resetToken);
+      if (!decoded) {
+        return res
+          .status(401)
+          .json({ message: "Invalid or expired reset token" });
+      }
+
+      const user = decoded.payload;
       if (!user) {
         return res.status(404).json({ message: "User does not exist" });
       }
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       await userModel.updateUser(user.id, {
-        ...user,
         password: hashedPassword,
       });
+
+      // Clear the reset token cookie after password reset
+      res.clearCookie("resetToken");
 
       return res.status(200).json({ message: "Password reset successfully" });
     } catch (error) {
