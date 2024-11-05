@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
 import { sendSignupEmail } from "./emailController.js";
 
@@ -12,24 +11,59 @@ const userController = {
    */
   signupUser: async (req, res) => {
     const { email, username, password } = req.body;
-    const hashedPassword = bcrypt.hashSync(password, 10);
 
     try {
+      const hashedPassword = await bcrypt.hash(password, 10);
       const user = await userModel.createUser(email, username, hashedPassword);
+
       if (user) {
-        await sendSignupEmail(
-          process.env.RESEND_DEFAULT_EMAIL,
-          email,
-          username
-        );
+        try {
+          await sendSignupEmail(
+            process.env.RESEND_DEFAULT_EMAIL,
+            email,
+            username
+          );
+        } catch (emailError) {
+          console.error("Error sending signup email:", emailError.message);
+        }
       }
+
       return res
         .status(201)
-        .json({ message: "User created successfully", user: user });
+        .json({ message: "User created successfully", user });
     } catch (error) {
       return res
         .status(500)
         .json({ error: error.message, message: "Can't create user" });
+    }
+  },
+
+  /**
+   * Resets the user's password
+   * @param {*} req The request object
+   * @param {*} res The response object
+   * @returns Success or error message
+   */
+  resetPassword: async (req, res) => {
+    const { email, newPassword } = req.body;
+
+    try {
+      const user = await userModel.findUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: "User does not exist" });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await userModel.updateUser(user.id, {
+        ...user,
+        password: hashedPassword,
+      });
+
+      return res.status(200).json({ message: "Password reset successfully" });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Server error", error: error.message });
     }
   },
 
@@ -49,7 +83,7 @@ const userController = {
         return res.status(404).json({ message: "User not found" });
       }
 
-      return res.status(200).json({ user: user });
+      return res.status(200).json({ user });
     } catch (error) {
       return res
         .status(500)
@@ -66,7 +100,7 @@ const userController = {
   getAllUsers: async (req, res) => {
     try {
       const users = await userModel.getAllUsers();
-      return res.status(200).json({ users: users });
+      return res.status(200).json({ users });
     } catch (error) {
       return res
         .status(500)
