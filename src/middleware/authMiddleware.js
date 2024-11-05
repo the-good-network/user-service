@@ -21,7 +21,7 @@ export const authenticate = (req, res, next) => {
 
     if (accessTokenVerification && accessTokenVerification.type === "access") {
       // Set the user ID in the request object
-      req.user = accessTokenVerification.payload;
+      req.id = accessTokenVerification.payload.id;
       return next();
     }
   }
@@ -42,7 +42,7 @@ export const authenticate = (req, res, next) => {
     res.setHeader("Authorization", `Bearer ${newAccessToken}`);
     // Set the user ID in the request object
     const newAccessTokenVerification = verifyToken(newAccessToken);
-    req.user = newAccessTokenVerification.payload;
+    req.id = newAccessTokenVerification.payload.id;
     return next();
   }
 
