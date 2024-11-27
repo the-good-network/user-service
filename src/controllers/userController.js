@@ -2,6 +2,7 @@ import argon2 from "argon2";
 import { verifyToken } from "../utils/jwtUtils.js";
 import userModel from "../models/userModel.js";
 import { sendSignupEmail } from "./emailController.js";
+import { generateToken, generateRefreshToken } from "../utils/jwtUtils.js";
 
 const userController = {
   /**
@@ -40,6 +41,19 @@ const userController = {
           console.error("Error sending signup email:", emailError.message);
         }
       }
+
+      const accessToken = generateToken(user.id, "1h");
+      const refreshToken = generateRefreshToken(user.id);
+
+      // Send refresh token as an HTTP-only cookie
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      });
+
+      res.header("Authorization", `Bearer ${accessToken}`);
 
       return res
         .status(201)
