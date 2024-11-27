@@ -17,7 +17,7 @@ const userModel = {
     if (error) {
       throw new Error(error.message);
     }
-    return data;
+    return data[0];
   },
 
   /**
