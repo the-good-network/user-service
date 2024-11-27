@@ -39,6 +39,8 @@ const authModel = {
       .from("reset-code")
       .select("*")
       .eq("userID", userID)
+      .order("expirationTime", { ascending: false }) // Fetch the latest reset code
+      .limit(1) // Ensure only one row is returned
       .single();
 
     if (error) {
