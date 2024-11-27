@@ -14,6 +14,13 @@ const userController = {
     const { email, username, password } = req.body;
 
     try {
+      const existingUser = await userModel.findUserByEmail(email);
+      if (existingUser) {
+        return res
+          .status(409)
+          .json({ message: "User already exists with this email" });
+      }
+
       const hashedPassword = await argon2.hash(password, {
         type: argon2.argon2id,
         memoryCost: 2 ** 16,
