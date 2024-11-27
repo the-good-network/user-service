@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import argon2 from "argon2";
 import { generateToken, generateRefreshToken } from "../utils/jwtUtils.js";
 import { generateResetCode, validateResetCode } from "../utils/utils.js";
 import userModel from "../models/userModel.js";
@@ -17,7 +17,7 @@ export const loginUsingEmail = async (req, res) => {
   try {
     const user = await userModel.findUserByEmail(email);
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || !(await argon2.verify(user.password, password))) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
