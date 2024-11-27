@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import { authenticate } from "./middleware/authMiddleware.js";
 
 const app = express();
@@ -14,6 +15,9 @@ app.use("/auth", authRoutes);
 
 // User routes
 app.use("/user", userRoutes);
+
+// Admin routes
+app.use("/admin", adminRoutes);
 
 // Protected route example using the authenticate middleware
 app.get("/protected", authenticate, (req, res) => {
