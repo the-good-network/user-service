@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import argon2 from "argon2";
 import { verifyToken } from "../utils/jwtUtils.js";
 import userModel from "../models/userModel.js";
 import { sendSignupEmail } from "./emailController.js";
@@ -14,7 +14,12 @@ const userController = {
     const { email, username, password } = req.body;
 
     try {
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await argon2.hash(password, {
+        type: argon2.argon2id,
+        memoryCost: 2 ** 16,
+        timeCost: 3,
+        parallelism: 1,
+      });
       const user = await userModel.createUser(email, username, hashedPassword);
 
       if (user) {
@@ -92,7 +97,12 @@ const userController = {
         return res.status(404).json({ message: "User does not exist" });
       }
 
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const hashedPassword = await argon2.hash(newPassword, {
+        type: argon2.argon2id,
+        memoryCost: 2 ** 16,
+        timeCost: 3,
+        parallelism: 1,
+      });
       await userModel.updateUser(userID, {
         password: hashedPassword,
       });
