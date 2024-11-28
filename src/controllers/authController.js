@@ -137,7 +137,11 @@ export const verifyResetCode = async (req, res) => {
  * @returns A success message
  */
 export const logout = async (req, res) => {
-  res.clearCookie("refreshToken");
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Strict",
+  });
   return res.status(200).json({
     message: "Logged out successfully",
     action: "Remove access token from client side",
