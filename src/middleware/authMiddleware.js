@@ -1,7 +1,4 @@
-import {
-  verifyToken,
-  refreshAllTokens,
-} from "../utils/jwtUtils.js";
+import { verifyToken, refreshAllTokens } from "../utils/jwtUtils.js";
 
 /**
  * Authenticates the user by checking the access token and refresh token
@@ -27,7 +24,7 @@ export const authenticate = (req, res, next) => {
   }
 
   // If the access token is invalid or expired, check the refresh token from the cookie
-  const refreshToken = req.cookies.refreshToken;
+  const refreshToken = req.cookies?.refreshToken;
 
   if (refreshToken) {
     const { newAccessToken, newRefreshToken } = refreshAllTokens(refreshToken);
