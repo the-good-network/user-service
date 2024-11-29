@@ -4,6 +4,7 @@ import {
   forgotPassword,
   verifyResetCode,
   logout,
+  refreshTokens,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -19,5 +20,8 @@ router.post("/forgot-password", forgotPassword);
 
 // Route to verify the reset code provided by the user
 router.post("/verify-reset-code", verifyResetCode);
+
+// Route to refresh the access and refresh tokens
+router.post("/refresh", refreshTokens);
 
 export default router;
