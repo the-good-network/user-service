@@ -45,17 +45,18 @@ export const verifyToken = (token, tokenType = "access") => {
 };
 
 /**
- * Refreshes the user's access & refresh tokens
- * Stores the new refresh token in an HTTP-only cookie
+ * Refreshes the user's access & refresh tokens only if refresh token is verified
  * @param {*} req The request object
  * @param {*} res The response object
  * @returns The latest access token
  */
-export const refreshAllTokens = (refreshToken) => {
-  const refreshTokenVerification = verifyToken(refreshToken, "refresh");
+export const refreshAllTokens = (refreshTokenVerification) => {
   if (refreshTokenVerification && refreshTokenVerification.type === "refresh") {
     // Generate new access and refresh tokens
-    const newAccessToken = generateToken(refreshTokenVerification.payload.id, "1h");
+    const newAccessToken = generateToken(
+      refreshTokenVerification.payload.id,
+      "1h"
+    );
     const newRefreshToken = generateRefreshToken(
       refreshTokenVerification.payload.id
     );
