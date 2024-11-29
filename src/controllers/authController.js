@@ -1,5 +1,10 @@
 import argon2 from "argon2";
-import { generateToken, generateRefreshToken } from "../utils/jwtUtils.js";
+import {
+  generateToken,
+  generateRefreshToken,
+  verifyToken,
+  refreshAllTokens,
+} from "../utils/jwtUtils.js";
 import { generateResetCode, validateResetCode } from "../utils/utils.js";
 import userModel from "../models/userModel.js";
 import authModel from "../models/authModel.js";
@@ -146,4 +151,44 @@ export const logout = async (req, res) => {
     message: "Logged out successfully",
     action: "Remove access token from client side",
   });
+};
+
+/**
+ * Refreshes the access and refresh token using a valid refresh token
+ * @param {*} req The request object
+ * @param {*} res The response object
+ * @returns A new access token
+ */
+export const refreshTokens = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    const refreshTokenVerification = verifyToken(refreshToken, "refresh");
+
+    // Verification failed
+    if (!refreshTokenVerification) {
+      return res.status(401).json({
+        message: "Can't verify refresh token",
+        action: "User needs to login",
+      });
+    }
+
+    const { newAccessToken, newRefreshToken } = refreshAllTokens(
+      refreshTokenVerification
+    );
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    res.setHeader("Authorization", `Bearer ${newAccessToken}`);
+
+    return res.status(200).json({ message: "Successfully refreshed tokens" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Can't refresh access token", error: error.message });
+  }
 };
