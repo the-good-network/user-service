@@ -1,34 +1,37 @@
-import { verifyToken, refreshAllTokens } from "../utils/jwtUtils.js";
+import { verifyToken } from "../utils/jwtUtils.js";
 
 /**
- * Authenticates the user by checking the access token
- * If the access token is valid, the user is authenticated
- * If the access token is invalid, returns an error
+ * Middleware to authenticate the user using an access token
  * @param {*} req The request object
  * @param {*} res The response object
  * @param {*} next The next middleware function
- * @returns Returns if everything is okay, otherwise returns an error message
+ * @returns Calls next() if the token is valid, otherwise returns an error
  */
 export const authenticate = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const accessToken = authHeader && authHeader.split(" ")[1];
+
+  if (!accessToken) {
+    return res.status(401).json({ message: "Access token not provided" });
+  }
+
   try {
-    const authHeader = req.headers["authorization"];
-    const accessToken = authHeader && authHeader.split(" ")[1];
+    // Verify the access token
+    const accessTokenVerification = verifyToken(accessToken);
 
-    if (accessToken) {
-      const accessTokenVerification = verifyToken(accessToken);
-
-      if (accessTokenVerification && accessTokenVerification.type == "access") {
-        req.id = accessTokenVerification.payload.id;
-        return next();
-      } else {
-        throw new Error("Can't verify access code");
-      }
-    } else {
-      throw new Error("Access code not found");
+    if (accessTokenVerification && accessTokenVerification.type === "access") {
+      req.id = accessTokenVerification.payload.id; // Attach user ID to the request
+      return next(); // Proceed to the next middleware or route handler
     }
+
+    throw new Error("Invalid token type or payload");
   } catch (error) {
-    return res
-      .status(403)
-      .json({ message: "Invalid or expired token", error: error.message });
+    // Log the error for debugging purposes (optional)
+    console.error("Authentication error: ", error.message);
+
+    return res.status(401).json({
+      message: "Invalid or expired access token",
+      error: error.message,
+    });
   }
 };
