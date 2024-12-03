@@ -26,9 +26,6 @@ export const authenticate = (req, res, next) => {
 
     throw new Error("Invalid token type or payload");
   } catch (error) {
-    // Log the error for debugging purposes (optional)
-    console.error("Authentication error: ", error.message);
-
     return res.status(401).json({
       message: "Invalid or expired access token",
       error: error.message,
