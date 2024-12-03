@@ -32,7 +32,7 @@ app.get("/protected", authenticate, (req, res) => {
   res.json({ message: `Hello, user ${req.id}!` });
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
