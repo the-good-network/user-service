@@ -137,6 +137,15 @@ const authController = {
       );
 
       if (response && response.status === 200) {
+        const passwordResetToken = generateToken(user.id, "10m");
+
+        res.cookie("passwordResetToken", passwordResetToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "Strict",
+          maxAge: 10 * 60 * 1000,
+        });
+
         return res.status(200).json({
           message: "Reset code sent to your email. Please check your inbox.",
         });
@@ -158,9 +167,26 @@ const authController = {
    * @returns A success message
    */
   verifyResetCode: async (req, res) => {
-    const { userID, enteredCode } = req.body;
+    const { enteredCode } = req.body;
+    const passwordResetToken = req.cookies.passwordResetToken;
+
+    if (!passwordResetToken) {
+      return res
+        .status(401)
+        .json({ message: "Reset token not found or expired" });
+    }
 
     try {
+      const decoded = verifyToken(passwordResetToken);
+      if (!decoded) {
+        return res.status(401).json({ message: "Invalid or expired token" });
+      }
+
+      const userID = decoded.payload.id;
+      if (!userID) {
+        return res.status(404).json({ message: "User does not exist" });
+      }
+
       const { data: resetData, error: resetError } =
         await authModel.getResetCode(userID);
 
@@ -186,6 +212,7 @@ const authController = {
         // Delete reset code from database after use
         await authModel.deleteResetCode(userID);
 
+        res.clearCookie("passwordResetToken");
         return res.status(200).json({ message: "Reset code verified" });
       } else {
         return res
