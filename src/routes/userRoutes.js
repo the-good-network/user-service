@@ -5,11 +5,10 @@ import { authorize } from "../middleware/authorizationMiddleware.js";
 
 const router = express.Router();
 
-router.post("/signup", userController.signupUser);
-router.post("/reset-password", userController.resetPassword);
-
+// User route to get own profile
 router.get("/", authenticate, userController.getOwnProfile);
 
+// Admin route to get all users
 router.get(
   "/users",
   authenticate,
@@ -17,6 +16,7 @@ router.get(
   userController.getAllUsers
 );
 
+// Admin route to get a user by ID
 router.get(
   "/user/:id",
   authenticate,
