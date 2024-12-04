@@ -9,7 +9,7 @@ const userModel = {
    * @returns The created user object
    */
   async createUser(email, username, password) {
-    const { userData, userError } = await supabase
+    const { data: userData, error: userError } = await supabase
       .from("user-service")
       .insert([{ email: email, username: username }])
       .select("*");
@@ -19,12 +19,12 @@ const userModel = {
     }
 
     // Insert the user's password into the user-auth table
-    const { passwordData, passwordError } = await supabase
+    const { data: passwordData, error: passwordError } = await supabase
       .from("user-auth")
       .insert([{ id: userData[0].id, password: password }]);
 
     if (passwordError) {
-      throw new Error(passwordError.message);
+      throw new Error(passwordError.message, "Error inserting password");
     }
 
     return userData[0];
@@ -53,7 +53,7 @@ const userModel = {
    * @returns The user and password object from the database
    */
   async findUserByEmailWithPassword(email) {
-    const { userData, userError } = await supabase
+    const { data: userData, error: userError } = await supabase
       .from("user-service")
       .select("*")
       .eq("email", email);
@@ -62,7 +62,7 @@ const userModel = {
       throw new Error(userError.message);
     }
 
-    const { passwordData, passwordError } = await supabase
+    const { data: passwordData, error: passwordError } = await supabase
       .from("user-auth")
       .select("password")
       .eq("id", userData[0].id);
