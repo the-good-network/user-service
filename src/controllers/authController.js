@@ -129,7 +129,7 @@ const authController = {
       const resetCode = generateResetCode();
       await authModel.insertResetCode(user.id, resetCode);
 
-      // Send forgot password email with reset password
+      // Send forgot password email with reset code
       const response = await emailController.sendForgotPasswordEmail(
         process.env.RESEND_DEFAULT_EMAIL,
         email,
@@ -161,13 +161,14 @@ const authController = {
     const { userID, enteredCode } = req.body;
 
     try {
-      const resetData = await authModel.getResetCode(userID);
+      const { data: resetData, error: resetError } =
+        await authModel.getResetCode(userID);
 
-      if (!resetData) {
+      if (!resetData || resetError) {
         return res.status(404).json({ message: "No reset code found" });
       }
 
-      const { resetCode, expirationTime } = resetData.data;
+      const { resetCode, expirationTime } = resetData;
 
       const isValid = validateResetCode(enteredCode, resetCode, expirationTime);
 
