@@ -1,8 +1,4 @@
-import argon2 from "argon2";
-import { verifyToken } from "../utils/jwtUtils.js";
 import userModel from "../models/userModel.js";
-import { sendSignupEmail } from "./emailController.js";
-import { generateToken, generateRefreshToken } from "../utils/jwtUtils.js";
 
 const userController = {
   /**

@@ -2,20 +2,21 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-/**
- * Sends a password reset email
- * @param {string} from - Sender's email
- * @param {string[]} to - Recipient's email array
- * @param {string} resetCode - 6-digit password reset code
- * @returns {Object} - Success or error message
- */
-export const sendForgotPasswordEmail = async (from, to, resetCode) => {
-  try {
-    const { data } = await resend.emails.send({
-      from: from,
-      to: to,
-      subject: "Reset Your Password",
-      html: `
+const emailController = {
+  /**
+   * Sends a password reset email
+   * @param {string} from - Sender's email
+   * @param {string[]} to - Recipient's email array
+   * @param {string} resetCode - 6-digit password reset code
+   * @returns {Object} - Success or error message
+   */
+  sendForgotPasswordEmail: async (from, to, resetCode) => {
+    try {
+      const { data } = await resend.emails.send({
+        from: from,
+        to: to,
+        subject: "Reset Your Password",
+        html: `
         <div style="font-family: Arial, sans-serif; color: #333;">
           <h2 style="color: #4CAF50;">Password Reset Request</h2>
           <p>Hello,</p>
@@ -27,34 +28,37 @@ export const sendForgotPasswordEmail = async (from, to, resetCode) => {
           <p>Best regards,<br>The Good Network Team</p>
         </div>
       `,
-    });
+      });
 
-    if (data) {
-      return { status: 200, message: "Password reset email sent successfully" };
+      if (data) {
+        return {
+          status: 200,
+          message: "Password reset email sent successfully",
+        };
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        error: error.message,
+        message: "Could not send password reset email",
+      };
     }
-  } catch (error) {
-    return {
-      status: 500,
-      error: error.message,
-      message: "Could not send password reset email",
-    };
-  }
-};
+  },
 
-/**
- * Sends a warm welcome email during signup
- * @param {string} from - Sender's email
- * @param {string[]} to - Recipient's email array
- * @param {string} username - Recipient's username when signing up
- * @returns  {Object} - Success or error message
- */
-export const sendSignupEmail = async (from, to, username) => {
-  try {
-    const { data } = await resend.emails.send({
-      from: from,
-      to: to,
-      subject: "Welcome to The Good Network!",
-      html: `
+  /**
+   * Sends a warm welcome email during signup
+   * @param {string} from - Sender's email
+   * @param {string[]} to - Recipient's email array
+   * @param {string} username - Recipient's username when signing up
+   * @returns  {Object} - Success or error message
+   */
+  sendSignupEmail: async (from, to, username) => {
+    try {
+      const { data } = await resend.emails.send({
+        from: from,
+        to: to,
+        subject: "Welcome to The Good Network!",
+        html: `
           <div style="font-family: Arial, sans-serif; color: #333;">
             <h2 style="color: #4CAF50;">Welcome to The Good Network, ${username}!</h2>
             <p>Hello ${username},</p>
@@ -71,12 +75,15 @@ export const sendSignupEmail = async (from, to, username) => {
             <p>Best regards,<br>The Good Network Team</p>
           </div>
         `,
-    });
+      });
 
-    if (data) {
-      return { message: "Signup email sent successfully" };
+      if (data) {
+        return { message: "Signup email sent successfully" };
+      }
+    } catch (error) {
+      return { error: error.message, message: "Could not send signup email" };
     }
-  } catch (error) {
-    return { error: error.message, message: "Could not send signup email" };
-  }
+  },
 };
+
+export default emailController;
