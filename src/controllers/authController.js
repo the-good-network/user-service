@@ -8,7 +8,7 @@ import {
 import { generateResetCode, validateResetCode } from "../utils/utils.js";
 import userModel from "../models/userModel.js";
 import authModel from "../models/authModel.js";
-import { sendForgotPasswordEmail } from "../controllers/emailController.js";
+import emailController from "../controllers/emailController.js";
 
 const authController = {
   /**
@@ -38,7 +38,7 @@ const authController = {
 
       if (user) {
         try {
-          await sendSignupEmail(
+          await emailController.sendSignupEmail(
             process.env.RESEND_DEFAULT_EMAIL,
             email,
             username
@@ -130,7 +130,7 @@ const authController = {
       await authModel.insertResetCode(user.id, resetCode);
 
       // Send forgot password email with reset password
-      const response = await sendForgotPasswordEmail(
+      const response = await emailController.sendForgotPasswordEmail(
         process.env.RESEND_DEFAULT_EMAIL,
         email,
         resetCode
