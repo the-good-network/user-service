@@ -48,6 +48,34 @@ const userModel = {
   },
 
   /**
+   * This function finds a user by their email address
+   * @param {*} email The user's email address
+   * @returns The user and password object from the database
+   */
+  async findUserByEmailWithPassword(email) {
+    const { userData, userError } = await supabase
+      .from("user-service")
+      .select("*")
+      .eq("email", email);
+
+    if (userError) {
+      throw new Error(userError.message);
+    }
+
+    const { passwordData, passwordError } = await supabase
+      .from("user-auth")
+      .select("password")
+      .eq("id", userData[0].id);
+
+    if (passwordError) {
+      throw new Error(passwordError.message);
+    }
+
+    const user = { ...userData[0], password: passwordData[0].password };
+    return user; // Return the user object with password
+  },
+
+  /**
    * This function finds a user by their id
    * @param {*} id The user's id in the database
    * @returns The user object from the database
