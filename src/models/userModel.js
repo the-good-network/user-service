@@ -9,15 +9,25 @@ const userModel = {
    * @returns The created user object
    */
   async createUser(email, username, password) {
-    const { data, error } = await supabase
+    const { userData, userError } = await supabase
       .from("user-service")
-      .insert([{ email: email, username: username, password: password }])
+      .insert([{ email: email, username: username }])
       .select("*");
 
-    if (error) {
-      throw new Error(error.message);
+    if (userError) {
+      throw new Error(userError.message);
     }
-    return data[0];
+
+    // Insert the user's password into the user-auth table
+    const { passwordData, passwordError } = await supabase
+      .from("user-auth")
+      .insert([{ id: userData[0].id, password: password }]);
+
+    if (passwordError) {
+      throw new Error(passwordError.message);
+    }
+
+    return userData[0];
   },
 
   /**
