@@ -141,6 +141,23 @@ const userModel = {
     }
     return data[0]; // Return the first user object
   },
+
+  /**
+   * This function resets a user's password in the database
+   * @param {*} id The user's id in the database
+   * @param {*} newPassword The new password to be saved
+   * @returns Throws an error if the update fails or returns nothing
+   */
+  async updatePassword(id, newPassword) {
+    const { data, error } = await supabase
+      .from("user-auth")
+      .update({ password: newPassword })
+      .eq("id", id);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default userModel;
