@@ -124,9 +124,7 @@ const userController = {
         timeCost: 3,
         parallelism: 1,
       });
-      await userModel.updateUser(userID, {
-        password: hashedPassword,
-      });
+      await userModel.updatePassword(userID, hashedPassword);
 
       // Clear the reset token cookie after password reset
       res.clearCookie("resetToken");
