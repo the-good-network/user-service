@@ -20,7 +20,7 @@ export const loginUsingEmail = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await userModel.findUserByEmail(email);
+    const user = await userModel.findUserByEmailWithPassword(email);
 
     if (!user || !(await argon2.verify(user.password, password))) {
       return res.status(401).json({ message: "Invalid email or password" });
